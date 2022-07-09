@@ -60,13 +60,19 @@
     // 下一張
     $('.img-list-handler .next').on('click', function(e){
       e.preventDefault();
-
+      if($('.img-window').position().left <= 0 && $('.img-window').position().left >= -2000){$('.img-window').animate({ left: "-=400px" }, 500);
+      }else{
+        $('.img-window').animate({ left: "0px" }, 500) //回到第一張
+      }
     });
 
     // 前一張
     $('.img-list-handler .prev').on('click', function(e){
       e.preventDefault();
-
+      if($('.img-window').position().left < 0 && $('.img-window').position().left >= -2000){$('.img-window').animate({ left: "+=400px" }, 500);
+      }else{
+        $('.img-window').animate({ left: "0px" }, 500) //回到第一張
+      }
     });
 
   </script>
