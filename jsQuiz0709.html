@@ -52,7 +52,10 @@
   <script type="text/javascript">
 
     // 目前顯示的圖片索引
-    var imgCurrPos = 0;
+    let imgCurrPos = 0;
+
+    //圖片總數
+    const imgNum=$('.img-window img').length
 
     // .img-window 的長度由圖片數量決定
     $('.img-window').css('width', $('.img-window img').length * 400 + 'px' );
@@ -60,14 +63,27 @@
     // 下一張
     $('.img-list-handler .next').on('click', function(e){
       e.preventDefault();
-
+      if(imgCurrPos+1<imgNum){
+        $('.img-window').animate({left: '-=400'})
+        imgCurrPos+=1
+      }else{
+        imgCurrPos=0
+        $('.img-window').animate({left: '0'})
+      }
     });
 
     // 前一張
     $('.img-list-handler .prev').on('click', function(e){
       e.preventDefault();
-
+      if(imgCurrPos>0){
+        $('.img-window').animate({left: '+=400'})
+        imgCurrPos-=1
+      }else{
+        imgCurrPos=imgNum-1
+        $('.img-window').animate({left: (imgNum-1)*-400})
+      }
     });
+
 
   </script>
 
