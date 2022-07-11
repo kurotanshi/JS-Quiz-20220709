@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>圖片「手動」輪播切換</title>
   <style type="text/css">
     body{
@@ -53,20 +56,65 @@
 
     // 目前顯示的圖片索引
     var imgCurrPos = 0;
+    
+    // 取出目前圖片的數量
+    let imgCount = $('.img-window img').length;
+
+    // 圖片寬度
+    const imgWidth = 400;
+
+    console.log('imgCurrPos:', imgCurrPos);
 
     // .img-window 的長度由圖片數量決定
-    $('.img-window').css('width', $('.img-window img').length * 400 + 'px' );
+    $('.img-window').css('width', imgCount * imgWidth + 'px' ) ;
 
+    
     // 下一張
     $('.img-list-handler .next').on('click', function(e){
       e.preventDefault();
-
+      
+      let getPos = $('.img-window').position().left;
+      
+      // 按下一張，postition就會 - 400px
+      if ( getPos % imgWidth === 0 && imgCurrPos < imgCount - 1) {
+        $('.img-window')
+          .stop()
+          .animate({ left: `${getPos - imgWidth}px` }, 500);
+        imgCurrPos += 1;
+        console.log('imgCurrPos:', imgCurrPos);
+      }
+      // 當圖片播到最後一張時，按下一張會回到第一張
+      else if ( imgCurrPos === (imgCount - 1) ) {
+        $('.img-window')
+          .stop()
+          .animate({ left: '0px' }, 500);
+        imgCurrPos = 0;
+        console.log('imgCurrPos:', imgCurrPos);
+      }
     });
 
+    
     // 前一張
     $('.img-list-handler .prev').on('click', function(e){
       e.preventDefault();
+      let getPos = $('.img-window').position().left;
 
+      // 按上一張，postition就會 + 400px
+      if ( getPos % imgWidth === 0 && imgCurrPos > 0 ) {
+        $('.img-window')
+          .stop()
+          .animate({ left: `${getPos + imgWidth}px` }, 500);
+        imgCurrPos -= 1;
+        console.log('imgCurrPos:', imgCurrPos);
+      }
+      // 當圖片播到第一張時，按上一張會回到最後一張
+      else if ( imgCurrPos === 0 ) {
+        $('.img-window')
+          .stop()
+          .animate({ left: `-${(imgCount  - 1)* imgWidth}px` }, 500);
+        imgCurrPos = imgCount - 1;
+        console.log('imgCurrPos:', imgCurrPos);
+      }
     });
 
   </script>
