@@ -15,7 +15,7 @@ let idx = 0;
 Nxt.on('click', function (e) {
   e.preventDefault();
   idx++;
-  if(idx > 6){
+  if(idx > ImgCount - 1){
     idx = 0;
   }
   Window.animate({left: idx * -400 + 'px'}, 500);
@@ -26,7 +26,7 @@ Prev.on('click', function (e) {
   e.preventDefault();
   idx--;
   if(idx < 0){
-    idx = 6;
+    idx = ImgCount - 1;
   }
   Window.animate({left: idx * -400 + 'px'}, 500);
 });
