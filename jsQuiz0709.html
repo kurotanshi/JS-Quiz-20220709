@@ -83,39 +83,34 @@
     // 圖片寬度
     const imgWidth = 400;
 
-    // 圖點依據目前是第幾張圖反白
+    // 圓點反白
     const pointOn = () => {
       $('.pointer').removeClass('active');
       $('.pointer').eq(imgCurrPos).addClass('active');
     }
-
-    console.log('imgCurrPos:', imgCurrPos);
-
+    
     // .img-window 的長度由圖片數量決定
     $('.img-window').css('width', imgCount * imgWidth + 'px' ) ;
-
+    
     
     // 下一張
     $('.img-list-handler .next').on('click', function(e){
       e.preventDefault();
       
-      let getPos = $('.img-window').position().left;
+      imgCurrPos += 1;
       
-      // 按下一張，postition就會 - 400px
-      if ( getPos % imgWidth === 0 && imgCurrPos < imgCount - 1) {
+      // 移動 第N張圖 * imgWidth 的距離
+      if ( imgCurrPos < imgCount ) {
         $('.img-window')
           .stop()
-          .animate({ left: `${getPos - imgWidth}px` }, 500);
-        imgCurrPos += 1;
-        console.log('imgCurrPos:', imgCurrPos);
+          .animate({ left: `${ - imgCurrPos * imgWidth}px` }, 500);
       }
-      // 當圖片播到最後一張時，按下一張會回到第一張
-      else if ( imgCurrPos === (imgCount - 1) ) {
+      // 當 imgCurrPos === img 數量時，回到第一張
+      else {
         $('.img-window')
           .stop()
           .animate({ left: '0px' }, 500);
         imgCurrPos = 0;
-        console.log('imgCurrPos:', imgCurrPos);
       }
 
       pointOn();
@@ -123,8 +118,15 @@
 
     
     // 前一張
+
+    // 這是我一開始的寫法，用 position 去判斷目前的位置來加減 px，這個寫法要避免按鈕連擊時會移動400px以外的距離，造成圖片移動有誤
+    // 因此判斷式還加了當前 postition % imgWidth 要等於 0，而且動畫沒跑完時，不管點多少下按鈕都只會動一張，
+    // 是比較麻煩又有缺陷的寫法，感覺上面的"下一張"作法會比較好
+
     $('.img-list-handler .prev').on('click', function(e){
       e.preventDefault();
+
+      // 取得 .img-window 當前的位置
       let getPos = $('.img-window').position().left;
 
       // 按上一張，postition就會 + 400px
@@ -133,7 +135,6 @@
           .stop()
           .animate({ left: `${getPos + imgWidth}px` }, 500);
         imgCurrPos -= 1;
-        console.log('imgCurrPos:', imgCurrPos);
       }
       // 當圖片播到第一張時，按上一張會回到最後一張
       else if ( imgCurrPos === 0 ) {
@@ -141,7 +142,6 @@
           .stop()
           .animate({ left: `-${(imgCount  - 1) * imgWidth}px` }, 500);
         imgCurrPos = imgCount - 1;
-        console.log('imgCurrPos:', imgCurrPos);
       }
 
       pointOn();
@@ -161,7 +161,7 @@
       }
 
       makeList();
-
+      pointOn();
 
       // 點擊圓點切換圖片
       $('.pointer').on('click', function(e) {
@@ -169,12 +169,13 @@
         $('.pointer').removeClass('active');
         $(this).addClass('active');
         
-        // 用 index('seletor') 來抓出 this 所在的 order number
+        // 用 index('selector') 抓出 this 所在的 order number
         const thisIdx = $(this).index('.pointer')
 
         $('.img-window')
           .stop()
           .animate({ left: `${ -thisIdx * imgWidth}px` }, 500);
+        imgCurrPos = thisIdx;
       })
 
   </script>
