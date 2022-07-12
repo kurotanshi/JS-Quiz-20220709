@@ -29,6 +29,25 @@
       font-size: 22px;
     }
 
+    .button-list {
+      position: relative;
+      bottom: 45px;
+      left: 120px;
+    }
+
+    .pointer {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 20px;
+      background-color: rgb(101, 101, 101);
+      margin: 5px;
+    }
+
+    .active {
+      background-color: rgb(255, 255, 255);
+    }
+
   </style>
 </head>
 <body>
@@ -44,6 +63,7 @@
       <img src="https://loremflickr.com/400/400?lock=7" alt="">
     </div>
   </div>
+
 
   <div class="img-list-handler">
     <button class="prev">前一張</button>
@@ -62,6 +82,12 @@
 
     // 圖片寬度
     const imgWidth = 400;
+
+    // 圖點依據目前是第幾張圖反白
+    const pointOn = () => {
+      $('.pointer').removeClass('active');
+      $('.pointer').eq(imgCurrPos).addClass('active');
+    }
 
     console.log('imgCurrPos:', imgCurrPos);
 
@@ -91,6 +117,8 @@
         imgCurrPos = 0;
         console.log('imgCurrPos:', imgCurrPos);
       }
+
+      pointOn();
     });
 
     
@@ -111,11 +139,43 @@
       else if ( imgCurrPos === 0 ) {
         $('.img-window')
           .stop()
-          .animate({ left: `-${(imgCount  - 1)* imgWidth}px` }, 500);
+          .animate({ left: `-${(imgCount  - 1) * imgWidth}px` }, 500);
         imgCurrPos = imgCount - 1;
         console.log('imgCurrPos:', imgCurrPos);
       }
+
+      pointOn();
     });
+
+
+    // 圓點選擇按鈕
+
+      // 建立圓點圖示
+
+      const makeList = () => {
+        $('.img-list').append('<div class="button-list"></div>');
+
+        for (let i = 0; i < imgCount; i++) {
+          $('.button-list').append('<div class="pointer"></div>');
+        }
+      }
+
+      makeList();
+
+
+      // 點擊圓點切換圖片
+      $('.pointer').on('click', function(e) {
+        // 先清除 active class，再為點到的圓點加上該class
+        $('.pointer').removeClass('active');
+        $(this).addClass('active');
+        
+        // 用 index('seletor') 來抓出 this 所在的 order number
+        const thisIdx = $(this).index('.pointer')
+
+        $('.img-window')
+          .stop()
+          .animate({ left: `${ -thisIdx * imgWidth}px` }, 500);
+      })
 
   </script>
 
