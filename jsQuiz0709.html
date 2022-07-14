@@ -32,7 +32,7 @@
     .button-list {
       position: relative;
       bottom: 45px;
-      left: 120px;
+      /* left: 120px; */
     }
 
     .pointer {
@@ -56,43 +56,55 @@
 </head>
 <body>
 
-  <div class="img-list">
-    <div class="img-window">
-      <img src="https://loremflickr.com/400/400?lock=1" alt="">
-      <img src="https://loremflickr.com/400/400?lock=2" alt="">
-      <img src="https://loremflickr.com/400/400?lock=3" alt="">
-      <img src="https://loremflickr.com/400/400?lock=4" alt="">
-      <img src="https://loremflickr.com/400/400?lock=5" alt="">
-      <img src="https://loremflickr.com/400/400?lock=6" alt="">
-      <img src="https://loremflickr.com/400/400?lock=7" alt="">
-    </div>
-  </div>
-
-
-  <div class="img-list-handler">
-    <button class="prev">前一張</button>
-    <button class="next">下一張</button>
-  </div>
-
-
   <script src="jquery-3.6.0.js"></script>
   <script type="text/javascript">
+    
+    // 定義想要顯示的貓圖數量
+    let imgCount = 16;
+
+    // 自定func，用來建立body的所有內容
+    const bodyMaker = () => {
+      $('body').append('<div class="img-list"></div>');
+
+      $('.img-list').append('<div class="img-window"></div>');
+
+      for (let i = 0; i < imgCount; i++) {
+        $('.img-window').append(`<img src="https://loremflickr.com/400/400?lock=${i}" alt="">`);
+      }
+
+      $('.img-list').append('<div class="button-list"></div>');
+
+      for (let i = 0; i < imgCount; i++) {
+        $('.button-list').append('<div class="pointer"></div>');
+      }
+
+      $('body').append('<div class="img-list-handler"></div>')
+
+      $('.img-list-handler').append('<button class="prev">前一張</button>')
+      $('.img-list-handler').append('<button class="next">下一張</button>')
+
+      pointOn()
+    }
 
     // 目前顯示的圖片索引
     var imgCurrPos = 0;
     
     // 取出目前圖片的數量
-    let imgCount = $('.img-window img').length;
-
+    // let imgCount = $('.img-window img').length;
+    
     // 圖片寬度
     const imgWidth = 400;
-
+    
     // 圓點反白
     const pointOn = () => {
       $('.pointer').removeClass('active');
       $('.pointer').eq(imgCurrPos).addClass('active');
     }
     
+
+    bodyMaker();
+
+
     // .img-window 的長度由圖片數量決定
     $('.img-window').css('width', imgCount * imgWidth + 'px' ) ;
     
@@ -152,24 +164,10 @@
     });
 
 
-    // 圓點選擇按鈕
-
-      // 建立圓點圖示
-      const makeList = () => {
-        $('.img-list').append('<div class="button-list"></div>');
-
-        for (let i = 0; i < imgCount; i++) {
-          $('.button-list').append('<div class="pointer"></div>');
-        }
-      }
-
-      makeList();
-      pointOn();
-
-      // 點擊圓點切換圖片
-      $('.pointer').on('click', function(e) {
-        // 先清除 active class，再為點到的圓點加上該class
-        $('.pointer').removeClass('active');
+    // 點擊圓點切換圖片
+    $('.pointer').on('click', function(e) {
+      // 先清除 active class，再為點到的圓點加上該class
+      $('.pointer').removeClass('active');
         $(this).addClass('active');
         
         // 用 index('selector') 抓出 this 所在的 order number
@@ -179,7 +177,7 @@
           .stop()
           .animate({ left: `${ -thisIdx * imgWidth}px` }, 500);
         imgCurrPos = thisIdx;
-      })
+    })
       
 
   </script>
