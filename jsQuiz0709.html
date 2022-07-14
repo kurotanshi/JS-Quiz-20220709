@@ -1,33 +1,94 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>圖片「手動」輪播切換</title>
   <style type="text/css">
-    body{
+    body {
       padding: 2em;
+      background: #000;
     }
 
-    .img-list{
-      display: block; position: relative;
-      width: 400px; height: 400px;
+    .img-list {
+      display: block;
+      position: relative;
+      width: 400px;
+      height: 400px;
       overflow: hidden;
       margin-bottom: 1em;
+      margin: auto;
     }
 
-    .img-window{
-      position: relative; display: block; width: 9999px; height: 400px;
+    .img-window {
+      position: relative;
+      display: block;
+      width: 9999px;
+      height: 400px;
     }
 
-    .img-window img{
-      display: block; float: left;
+    .img-window img {
+      display: block;
+      float: left;
     }
 
-    .img-list-handler button{
-      font-size: 22px;
+    .img-list-btn-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
     }
 
+    .img-list-btn {
+      height: 15px;
+      width: 15px;
+      background: rgb(126, 126, 126);
+      margin: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .img-list-btn:hover {
+      background: rgb(54, 54, 54);
+    }
+
+    .active {
+      background: rgb(223, 160, 43);
+    }
+
+    .img-list-handler button {
+      font-size: 50px;
+      background: none;
+      cursor: pointer;
+      border: none;
+    }
+
+    i {
+      width: 30px;
+      height: 30px;
+      color: aliceblue;
+    }
+
+    i:hover{
+      color: rgb(223, 160, 43);
+    }
+
+    .prev {
+      float: left;
+    }
+
+    .next {
+      float: right;
+    }
+
+   
+    button:disabled>i{
+      color: rgba(161, 158, 158, 0.178);
+    }
   </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
+
 <body>
 
   <div class="img-list">
@@ -42,34 +103,97 @@
     </div>
   </div>
 
+
+
   <div class="img-list-handler">
-    <button class="prev">前一張</button>
-    <button class="next">下一張</button>
+    <button class="prev"> <i class="fa fa-angle-left"></i></button>
+    <button class="next"> <i class="fa fa-angle-right"></i></button>
+    <div class="img-list-btn-block"></div>
   </div>
-
-
+  
   <script src="jquery-3.6.0.js"></script>
   <script type="text/javascript">
+    let imgCurrPos;
 
-    // 目前顯示的圖片索引
-    var imgCurrPos = 0;
+    //圓點按鈕
+    const imgBtnObj = {
+      "_create": function (){
+        $('.img-window>img').each((i) => {
+          $('.img-list-btn-block').append(`<span class="img-list-btn" id=imgBtn_${++i}></span>`);
+        });
 
-    // .img-window 的長度由圖片數量決定
-    $('.img-window').css('width', $('.img-window img').length * 400 + 'px' );
+        $('.img-list-btn').first().addClass('active');
+      },
+      "_active":function(elem){
+        $('.active').removeClass('active');
+        $(elem).addClass('active');
+      }
+    }
+
+    const init = function () {
+      imgCurrPos = 0;  // 目前顯示的圖片索引
+      $('.img-window').css('width', $('.img-window img').length * 400 + 'px');// .img-window 的長度由圖片數量決定
+      imgBtnObj._create();
+    }
+
+    //取得img索引
+    const getImgIndex = function(currentIndex, action) {
+      let imgIndex = -1;
+      let last= $('.img-window img').length - 1;
+      if (action === 'next') {
+        imgIndex = currentIndex === last ? 0 : ++currentIndex;
+      } else if (action === 'prev') {
+        imgIndex = currentIndex === 0 ? last : --currentIndex;
+      }
+      imgCurrPos =imgIndex;
+      return imgIndex;
+    }
+
+    //圖片移動
+    const imgMove =function (action,currentImgIndex ) {
+      $('button').prop('disabled', true);
+      
+      let imgCurrPos = action==="dotsClick" ? currentImgIndex:getImgIndex(currentImgIndex, action);
+      console.log(imgCurrPos);
+      imgBtnObj._active($(".img-list-btn")[imgCurrPos]);
+
+      $(".img-window").stop().animate({ 'left': `${imgCurrPos * -400}px` }, 1000,function(){
+        $('button').prop('disabled', false);
+      });
+
+    }
+
+    $(function () {
+      init();
+    })
 
     // 下一張
-    $('.img-list-handler .next').on('click', function(e){
+    $('.img-list-handler .next').on('click', function (e) {
       e.preventDefault();
-
+      e.stopPropagation();
+      imgMove("next",imgCurrPos);
     });
 
     // 前一張
-    $('.img-list-handler .prev').on('click', function(e){
+    $('.img-list-handler .prev').on('click', function (e) {
       e.preventDefault();
+      e.stopPropagation();
+      imgMove("prev",imgCurrPos);
 
     });
+
+    $('.img-list-btn-block').on('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.target !== e.currentTarget) {
+        imgCurrPos = (e.target.id.split('_')[1]) - 1;
+        imgMove("dotsClick",imgCurrPos);
+      }
+    })
+
 
   </script>
 
 </body>
+
 </html>
