@@ -59,19 +59,28 @@
   <script src="jquery-3.6.0.js"></script>
   <script type="text/javascript">
     
-    // 定義想要顯示的貓圖數量
-    let imgCount = 16;
-
-    // 自定func，用來建立body的所有內容
+    
+    // 建立body的所有內容 by jquery
     const bodyMaker = () => {
+      
       $('body').append('<div class="img-list"></div>');
 
       $('.img-list').append('<div class="img-window"></div>');
-
-      for (let i = 0; i < imgCount; i++) {
-        $('.img-window').append(`<img src="https://loremflickr.com/400/400?lock=${i}" alt="">`);
-      }
-
+      
+        // for (let i = 0; i < imgCount; i++) {
+        //   $('.img-window').append(`<img src="https://loremflickr.com/400/400?lock=${i}" alt="">`);
+        // }
+        
+        const urlList = [];
+        
+        for (let i = 0; i < imgCount; i++) {
+          urlList.push(`https://loremflickr.com/400/400?lock=${i}`)
+        }
+        
+        urlList.map ( (url) => {
+          $('.img-window').append(`<img src="${url}" alt="">`);
+        }) 
+        
       $('.img-list').append('<div class="button-list"></div>');
 
       for (let i = 0; i < imgCount; i++) {
@@ -79,18 +88,18 @@
       }
 
       $('body').append('<div class="img-list-handler"></div>')
-
+      
       $('.img-list-handler').append('<button class="prev">前一張</button>')
       $('.img-list-handler').append('<button class="next">下一張</button>')
-
+      
       pointOn()
     }
 
+    // 定義想要顯示的貓圖數量
+    const imgCount = 16;
+    
     // 目前顯示的圖片索引
     var imgCurrPos = 0;
-    
-    // 取出目前圖片的數量
-    // let imgCount = $('.img-window img').length;
     
     // 圖片寬度
     const imgWidth = 400;
