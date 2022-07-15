@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>圖片「手動」輪播切換</title>
   <style type="text/css">
     body{
@@ -26,48 +29,165 @@
       font-size: 22px;
     }
 
+    .button-list {
+      position: relative;
+      bottom: 45px;
+      /* left: 120px; */
+    }
+
+    .pointer {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 20px;
+      background-color: rgba(101, 101, 101, 0.639);
+      margin: 5px;
+    }
+
+    .pointer:hover {
+      background-color: rgba(255, 255, 255, 0.508);
+    }
+
+    .active {
+      background-color: rgba(255, 255, 255, 0.508);
+    }
+
   </style>
 </head>
 <body>
 
-  <div class="img-list">
-    <div class="img-window">
-      <img src="https://loremflickr.com/400/400?lock=1" alt="">
-      <img src="https://loremflickr.com/400/400?lock=2" alt="">
-      <img src="https://loremflickr.com/400/400?lock=3" alt="">
-      <img src="https://loremflickr.com/400/400?lock=4" alt="">
-      <img src="https://loremflickr.com/400/400?lock=5" alt="">
-      <img src="https://loremflickr.com/400/400?lock=6" alt="">
-      <img src="https://loremflickr.com/400/400?lock=7" alt="">
-    </div>
-  </div>
-
-  <div class="img-list-handler">
-    <button class="prev">前一張</button>
-    <button class="next">下一張</button>
-  </div>
-
-
   <script src="jquery-3.6.0.js"></script>
   <script type="text/javascript">
+    
+    
+    // 建立body的所有內容 by jquery
+    const bodyMaker = () => {
+      
+      $('body').append('<div class="img-list"></div>');
 
+      $('.img-list').append('<div class="img-window"></div>');
+      
+        // for (let i = 0; i < imgCount; i++) {
+        //   $('.img-window').append(`<img src="https://loremflickr.com/400/400?lock=${i}" alt="">`);
+        // }
+        
+        const urlList = [];
+        
+        for (let i = 0; i < imgCount; i++) {
+          urlList.push(`https://loremflickr.com/400/400?lock=${i}`)
+        }
+        
+        urlList.map ( (url) => {
+          $('.img-window').append(`<img src="${url}" alt="">`);
+        }) 
+        
+      $('.img-list').append('<div class="button-list"></div>');
+
+      for (let i = 0; i < imgCount; i++) {
+        $('.button-list').append('<div class="pointer"></div>');
+      }
+
+      $('body').append('<div class="img-list-handler"></div>')
+      
+      $('.img-list-handler').append('<button class="prev">前一張</button>')
+      $('.img-list-handler').append('<button class="next">下一張</button>')
+      
+      pointOn()
+    }
+
+    // 定義想要顯示的貓圖數量
+    const imgCount = 16;
+    
     // 目前顯示的圖片索引
     var imgCurrPos = 0;
+    
+    // 圖片寬度
+    const imgWidth = 400;
+    
+    // 圓點反白
+    const pointOn = () => {
+      $('.pointer').removeClass('active');
+      $('.pointer').eq(imgCurrPos).addClass('active');
+    }
+    
+
+    bodyMaker();
+
 
     // .img-window 的長度由圖片數量決定
-    $('.img-window').css('width', $('.img-window img').length * 400 + 'px' );
-
+    $('.img-window').css('width', imgCount * imgWidth + 'px' ) ;
+    
+    
     // 下一張
     $('.img-list-handler .next').on('click', function(e){
       e.preventDefault();
+      
+      imgCurrPos += 1;
+      
+      // 移動 第N張圖 * imgWidth 的距離
+      if ( imgCurrPos < imgCount ) {
+        $('.img-window')
+          .stop()
+          .animate({ left: `${ - imgCurrPos * imgWidth}px` }, 500);
+      }
+      // 當 imgCurrPos === img 數量時，回到第一張
+      else {
+        $('.img-window')
+          .stop()
+          .animate({ left: '0px' }, 500);
+        imgCurrPos = 0;
+      }
 
+      pointOn();
     });
 
+    
     // 前一張
+
+    // 這是我一開始的寫法，用 position 去判斷目前的位置來加減 px，這個寫法要避免按鈕連擊時會移動400px以外的距離，造成圖片移動有誤
+    // 因此判斷式還加了當前 postition % imgWidth 要等於 0，而且動畫沒跑完時，不管點多少下按鈕都只會動一張，
+    // 是比較麻煩又有缺陷的寫法，感覺上面的"下一張"作法會比較好
+
     $('.img-list-handler .prev').on('click', function(e){
       e.preventDefault();
 
+      // 取得 .img-window 當前的位置
+      let getPos = $('.img-window').position().left;
+
+      // 按上一張，postition就會 + 400px
+      if ( getPos % imgWidth === 0 && imgCurrPos > 0 ) {
+        $('.img-window')
+          .stop()
+          .animate({ left: `${getPos + imgWidth}px` }, 500);
+        imgCurrPos -= 1;
+      }
+      // 當圖片播到第一張時，按上一張會回到最後一張
+      else if ( imgCurrPos === 0 ) {
+        $('.img-window')
+          .stop()
+          .animate({ left: `-${(imgCount  - 1) * imgWidth}px` }, 500);
+        imgCurrPos = imgCount - 1;
+      }
+
+      pointOn();
     });
+
+
+    // 點擊圓點切換圖片
+    $('.pointer').on('click', function(e) {
+      // 先清除 active class，再為點到的圓點加上該class
+      $('.pointer').removeClass('active');
+        $(this).addClass('active');
+        
+        // 用 index('selector') 抓出 this 所在的 order number
+        const thisIdx = $(this).index('.pointer');
+
+        $('.img-window')
+          .stop()
+          .animate({ left: `${ -thisIdx * imgWidth}px` }, 500);
+        imgCurrPos = thisIdx;
+    })
+      
 
   </script>
 
